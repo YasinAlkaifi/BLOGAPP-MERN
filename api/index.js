@@ -135,55 +135,15 @@ app.post('/post', uploadMiddleware.single('file'), async (req,res) => {
 //  Delete API  
 app.delete('/delete', uploadMiddleware.single('file'), async (req, res) => {
     console.log("In del api");
-    // const postId = req.params.postId;
     
-    // try {
-    //   // Check if the user is authorized to delete the post
-    //   const { token } = req.cookies;
-    //   const decodedToken = jwt.verify(token, secret);
-    //   const userId = decodedToken.id;
-    //   const post = await Post.findById(postId);
-      
-    //   if (!post) {
-    //     return res.status(404).json({ message: 'Post not found' });
-    //   }
-      
-    //   if (post.author.toString() !== userId) {
-    //     return res.status(403).json({ message: 'You are not authorized to delete this post' });
-    //   }
-      
-    //   // Delete the post
-    //   await Post.findByIdAndDelete(postId);
-      
-    //   res.json({ message: 'Post deleted successfully' });
-    // } 
-    // catch (error) {
-    //   console.error('Error deleting post:', error);
-    //   res.status(500).json({ message: 'An error occurred while deleting the post' });
-    // }
     const {token} = req.cookies;
     jwt.verify(token, secret, {}, async (err,info) => {
       if (err) throw err;
 
       const {userid,postid} = req.body;
       const postDoc = await Post.findById(postid);
-    //   const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
-
-    //   const {userinf,postinf} = req.body;
-    //   const postDoc = await Post.findById(userinf.id);
-    //   const isAuthor = JSON.stringify(postDoc) === JSON.stringify(postinf.author._id);
-    //   if (!isAuthor) {
-    //     return res.status(400).json('you are not the author');
-    //   }
     console.log(postDoc);
       await Post.findByIdAndDelete(postid);
-
-    //   await postDoc.updateOne({
-    //     title,
-    //     summary,
-    //     content,
-    //     cover: newPath ? newPath : postDoc.cover,
-    //   });
       res.json(postDoc);
     });
   });
