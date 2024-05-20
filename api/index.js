@@ -30,6 +30,44 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 mongoose.connect('mongodb+srv://l201305:YEpepijpaL7WCS7v@cluster0.00p3juv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
  
 
+app.post('/register', async (req,res) => {
+    const {username,password} = req.body;
+    try{
+      const userDoc = await User.create({
+        username,
+        password:bcrypt.hashSync(password,salt),
+      });
+      res.json(userDoc);
+    } catch(e) {
+      console.log(e);
+      res.status(400).json(e);
+    }
+  });
+
+  
+app.post('/login', async (req,res) => {
+    const {username,password} = req.body;
+    //find a user with the entered username
+    const userDoc = await User.findOne({username});
+    //match the password for the fined user
+    const passOk = bcrypt.compareSync(password, userDoc.password);
+
+    if (passOk) {
+      // logged in
+      jwt.sign({username,id:userDoc._id}, secret, {}, (err,token) => {
+        if (err) throw err;
+        res.cookie('token', token).json({
+          id:userDoc._id,
+          username,
+        });
+      });
+    } else {
+      res.status(400).json('wrong credentials');
+    }
+  });
+
+
+  
   
 const PORT = 4000;
 
